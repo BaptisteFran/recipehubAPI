@@ -1,9 +1,21 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
+from src.api.database.db import create_db_and_tables
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await create_db_and_tables()
+    yield
+
 
 app = FastAPI(
     title="RecipeHub API",
     description="API de gestion de recettes",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
