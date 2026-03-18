@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 from typing import Annotated, Sequence, cast
 from sqlalchemy import and_, or_, text
-from sqlalchemy.sql import ColumnElement
+from sqlalchemy.sql import ColumnElement, delete
 from sqlmodel import Session, select
 
 from src.api.database.db import Engine
@@ -93,3 +93,12 @@ def post_recipe(recipe: Recipe, session: SessionDep) -> Recipe:
     session.commit()
     session.refresh(recipe)
     return recipe
+
+@app.delete("/recipe/{recipe_id}")
+def delete_recipe(recipe_id: int, session: SessionDep) -> None:
+    recipe = session.get(Recipe, recipe_id)
+    if not recipe:
+        return
+
+    session.delete(recipe)
+    session.commit()
